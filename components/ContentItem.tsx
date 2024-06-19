@@ -4,12 +4,10 @@ import {
   useInitial,
   usePosition,
   useScrollDown,
-  useScrolled,
 } from "@/contexts/ContextHooks";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
-// import { useInView } from "react-intersection-observer";
 
 type ContentItemProps = {
   index: number;
@@ -26,14 +24,8 @@ const ContentItem = ({ index, item }: ContentItemProps) => {
   const { position, setPosition } = usePosition();
   const { scrollDown, setScrollDown } = useScrollDown();
   const { initial, setInitial } = useInitial();
-  const { scrolled, setScrolled } = useScrolled();
   const containerRef = useRef<HTMLDivElement>(null);
-  // const { ref: containerRef, inView: containerInView } = useInView({
-  //   threshold: 0.9,
-  // });
 
-  let dragStart = false;
-  let isDragging = false;
   const [prevPageY, setPrevPageY] = useState(null);
   let positionDiff: any;
 
@@ -67,7 +59,6 @@ const ContentItem = ({ index, item }: ContentItemProps) => {
 
   // DeskTop
   const dragStartDeskTop = (e: any) => {
-    // updating global variables value on mouse down event
     let initialY = e.clientY;
     setPrevPageY(e.clientY);
     console.log(initialY, "dragStart");
@@ -81,18 +72,20 @@ const ContentItem = ({ index, item }: ContentItemProps) => {
   };
 
   const draggingDeskTop = (e: any) => {
-    positionDiff = e.clientY - prevPageY;
-    // console.log(positionDiff, "diff");
+    if (prevPageY !== null) {
+      positionDiff = e.clientY - prevPageY;
+    }
+
     return;
   };
 
   // Mobile
   const dragStartMobile = (e: any) => {
     let initialY = e.touches[0].clientY;
-    setPrevPageY(e.touches[0].clientY);
-    // console.log(initialY, "dragStart");
+    setPrevPageY(initialY);
   };
 
+  // eslint-disable-next-line no-unused-vars
   const dragStopMobile = (e: any) => {
     let finalY = prevPageY + positionDiff;
     console.log(finalY, "dragStop");
@@ -101,8 +94,9 @@ const ContentItem = ({ index, item }: ContentItemProps) => {
   };
 
   const draggingMobile = (e: any) => {
-    positionDiff = e.touches[0].clientY - prevPageY;
-    console.log(positionDiff, "diff");
+    if (prevPageY !== null) {
+      positionDiff = e.touches[0].clientY - prevPageY;
+    }
   };
 
   return (
